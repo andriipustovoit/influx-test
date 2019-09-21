@@ -1,0 +1,33 @@
+version: "3.0"
+
+services:
+
+  influxdb:
+    image: influxdb:1.7.7-alpine
+    volumes:
+    - ./influxdb_data:/var/lib/influxdb
+    ports:
+    - "8086:8086"
+
+  telegraf:
+    image: telegraf:1.11.5-alpine
+    volumes:
+    - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    ports:
+    - "8094:8094/udp"
+    environment:
+    - INFLUX_DATABASE=wechat_local
+    - INFLUX_URL=http://influxdb:8086
+    depends_on:
+    - influxdb
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+    - grafana_storage:/var/lib/grafana
+    ports:
+    - "4000:3000"
+
+volumes:
+  grafana_storage:
+
